@@ -5,16 +5,27 @@ void connectWiFi(Adafruit_SSD1306 &display, WiFiManager &wifiManager,
                  WiFiManagerParameter &customDataEndpoint, char *dataEndpoint,
                  DeviceState &state)
 {
+    wifiManager.addParameter(&customDataEndpoint);
+
+    wifiManager.setAPCallback([&display, &state](WiFiManager *mgr)
+                              {
+        if (state.displayOk) {
+            display.clearDisplay();
+            display.setCursor(0, 0);
+            display.println("Connect to access point:");
+            display.println("AutoConnectAP");
+            display.display();
+        } });
+
     if (state.displayOk)
     {
         display.clearDisplay();
         display.setCursor(0, 0);
-        display.println("Connect to access point:");
-        display.println("AutoConnectAP");
+        display.print("Connecting to ");
+        display.println(WiFi.SSID());
         display.display();
     }
 
-    wifiManager.addParameter(&customDataEndpoint);
     wifiManager.autoConnect("AutoConnectAP");
 
     strcpy(dataEndpoint, customDataEndpoint.getValue());
