@@ -6,20 +6,10 @@ String generateHtmlResponse(const DeviceState &state)
     String html = "<!DOCTYPE HTML><html><head>";
     html += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
     html += "<style>body{font-family:Arial;margin:20px;} .reset-btn{background-color:#ff3333;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}</style></head><body>";
-    html += "<h2>Sensor Status</h2>";
-    html += "<p>Display: " + String(state.displayOk ? "OK" : "Error") + "</p>";
-    html += "<p>SHT40: " + String(state.sht4Ok ? "OK" : "Error") + "</p>";
-    html += "<p>MH-Z19B: " + String(state.mhz19Ok ? "OK" : "Error") + "</p>";
 
-    if (state.sht4Ok)
-    {
-        html += "<p>Temperature: " + String(state.temperature, 1) + " °C</p>";
-        html += "<p>Humidity: " + String(state.humidity, 1) + "%</p>";
-    }
-    if (state.mhz19Ok)
-    {
-        html += "<p>CO2: " + String(state.co2) + " ppm</p>";
-    }
+    html += "<p>Temperature: " + String(state.temperature, 1) + " °C</p>";
+    html += "<p>Humidity: " + String(state.humidity, 1) + "%</p>";
+    html += "<p>CO2: " + String(state.co2) + " ppm</p>";
 
     html += "<form method='POST' action='/reset'>";
     html += "<input type='submit' class='reset-btn' value='Reset WiFi Configuration'>";
@@ -51,17 +41,13 @@ void handleClient(WiFiServer &server, WiFiManager &wifiManager,
         client.println("</body></html>");
         client.stop();
 
-        if (state.displayOk)
-        {
-            display.clearDisplay();
-            display.setCursor(0, 0);
-            display.println("WiFi Reset");
-            display.println("Connect to:");
-            display.println("AutoConnectAP");
-            display.display();
-        }
+        display.clearDisplay();
+        display.setCursor(0, 0);
+        display.println("WiFi Reset");
+        display.display();
 
         delay(1000);
+
         wifiManager.resetSettings();
         ESP.restart();
     }

@@ -50,7 +50,7 @@ void sendDataToServer(const char *dataEndpoint, const AveragingBuffer &buffer,
 
     int httpResponseCode = http.POST(jsonString);
 
-    if (httpResponseCode > 0 && state.displayOk)
+    if (httpResponseCode > 0)
     {
         display.clearDisplay();
         display.setCursor(0, 0);

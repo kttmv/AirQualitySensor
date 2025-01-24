@@ -33,9 +33,6 @@ struct AveragingBuffer
 
 struct DeviceState
 {
-    bool displayOk = false;
-    bool sht4Ok = false;
-    bool mhz19Ok = false;
     float temperature = 0.0;
     float humidity = 0.0;
     int co2 = 0;

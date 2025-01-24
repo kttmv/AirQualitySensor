@@ -15,28 +15,20 @@ void connectWiFi(Adafruit_SSD1306 &display, WiFiManager &wifiManager,
     };
     wifiManager.setAPCallback(displayAPCallback);
 
-    if (state.displayOk)
-    {
-        showConnectingScreen(display);
-    }
+    showConnectingScreen(display);
 
     if (!wifiManager.autoConnect("AutoConnectAP"))
     {
-        if (state.displayOk)
-        {
-            showErrorScreen(display);
-            delay(2000);
-        }
+        showErrorScreen(display);
+        delay(2000);
+
         return;
     }
 
     strcpy(dataEndpoint, customDataEndpoint.getValue());
 
-    if (state.displayOk)
-    {
-        showSuccessScreen(display, dataEndpoint);
-        delay(3000);
-    }
+    showSuccessScreen(display, dataEndpoint);
+    delay(3000);
 }
 
 void showAPScreen(Adafruit_SSD1306 &display)
@@ -47,6 +39,7 @@ void showAPScreen(Adafruit_SSD1306 &display)
     display.println("connect to hotspot:");
     display.println("> AutoConnectAP");
     drawFooter(display, "Timeout: 60s");
+    display.display();
 }
 
 void showConnectingScreen(Adafruit_SSD1306 &display)
@@ -57,6 +50,7 @@ void showConnectingScreen(Adafruit_SSD1306 &display)
     display.print("> ");
     display.println(WiFi.SSID());
     drawFooter(display, "Please wait...");
+    display.display();
 }
 
 void showErrorScreen(Adafruit_SSD1306 &display)
@@ -66,6 +60,7 @@ void showErrorScreen(Adafruit_SSD1306 &display)
     display.println("Connection failed");
     display.println("Timeout reached");
     drawFooter(display, "No WiFi available");
+    display.display();
 }
 
 void showSuccessScreen(Adafruit_SSD1306 &display, const char *dataEndpoint)
@@ -76,4 +71,5 @@ void showSuccessScreen(Adafruit_SSD1306 &display, const char *dataEndpoint)
     display.print("> ");
     display.println(WiFi.localIP());
     drawFooter(display, "Ready");
+    display.display();
 }
