@@ -1,21 +1,28 @@
 #include "wifi_setup.h"
 #include <ESP8266WiFi.h>
 
+#include "wifi_setup.h"
+#include <ESP8266WiFi.h>
+
 void connectWiFi(Adafruit_SSD1306 &display, WiFiManager &wifiManager,
                  WiFiManagerParameter &customDataEndpoint, char *dataEndpoint,
                  DeviceState &state)
 {
     wifiManager.addParameter(&customDataEndpoint);
 
-    wifiManager.setAPCallback([&display, &state](WiFiManager *mgr)
-                              {
-        if (state.displayOk) {
-            display.clearDisplay();
-            display.setCursor(0, 0);
-            display.println("Connect to access point:");
-            display.println("AutoConnectAP");
-            display.display();
-        } });
+    wifiManager.setConfigPortalTimeout(60);
+
+    auto displayAPCallback = [&display](WiFiManager *mgr)
+    {
+        display.clearDisplay();
+        display.setCursor(0, 0);
+        display.println("Connect to access point:");
+        display.println("AutoConnectAP");
+        display.println("Timeout: 60 seconds");
+        display.display();
+    };
+
+    wifiManager.setAPCallback(displayAPCallback);
 
     if (state.displayOk)
     {
@@ -26,7 +33,19 @@ void connectWiFi(Adafruit_SSD1306 &display, WiFiManager &wifiManager,
         display.display();
     }
 
-    wifiManager.autoConnect("AutoConnectAP");
+    if (!wifiManager.autoConnect("AutoConnectAP"))
+    {
+        if (state.displayOk)
+        {
+            display.clearDisplay();
+            display.setCursor(0, 0);
+            display.println("Timeout reached");
+            display.println("Continuing without WiFi");
+            display.display();
+            delay(2000);
+        }
+        return;
+    }
 
     strcpy(dataEndpoint, customDataEndpoint.getValue());
 
