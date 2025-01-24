@@ -5,7 +5,7 @@
 void showAPScreen(Adafruit_SSD1306 &display)
 {
     display.clearDisplay();
-    drawHeader(display, "WiFi");
+    drawHeader(display, "WiFi", 2);
     display.println("To configure wi-fi");
     display.println("connect to hotspot:");
     display.println("> AutoConnectAP");
@@ -15,7 +15,7 @@ void showAPScreen(Adafruit_SSD1306 &display)
 void showConnectingScreen(Adafruit_SSD1306 &display)
 {
     display.clearDisplay();
-    drawHeader(display, "WiFi");
+    drawHeader(display, "WiFi", 2);
     display.println("Connecting to:");
     display.print("> ");
     display.println(WiFi.SSID());
@@ -26,7 +26,7 @@ void showConnectingScreen(Adafruit_SSD1306 &display)
 void showSuccessScreen(Adafruit_SSD1306 &display, const char *dataEndpoint)
 {
     display.clearDisplay();
-    drawHeader(display, "WiFi");
+    drawHeader(display, "WiFi", 2);
     display.println("Connected!");
     display.print("> ");
     display.println(WiFi.localIP());

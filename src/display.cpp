@@ -1,18 +1,21 @@
 #include "display.h"
+#include <ESP8266WiFi.h>
 
-void drawHeader(Adafruit_SSD1306 &display, const char *headerText)
+void drawHeader(Adafruit_SSD1306 &display, const char *headerText, int textSize)
 {
-    display.setTextSize(2);
+    display.setTextSize(textSize);
     display.setTextColor(WHITE);
     display.setCursor(0, 0);
     display.println(headerText);
-    display.drawLine(0, 16, 128, 16, WHITE);
+    display.drawLine(0, textSize * 8, 128, textSize * 8, WHITE);
+
+    display.setCursor(0, textSize * 10);
     display.setTextSize(1);
-    display.setCursor(0, 20);
 }
 
 void drawFooter(Adafruit_SSD1306 &display, const char *footerText)
 {
+    display.setTextSize(1);
     display.drawRect(0, 48, 128, 16, WHITE);
     display.setCursor(4, 52);
     display.print(footerText);
@@ -30,21 +33,47 @@ void initDisplay(Adafruit_SSD1306 &display, DeviceState &state)
 void updateDisplay(Adafruit_SSD1306 &display, const DeviceState &state)
 {
     display.clearDisplay();
-    display.setCursor(0, 0);
 
-    display.print("Temp: ");
+    drawHeader(display, WiFi.status() == WL_CONNECTED ? "WiFi connected" : "Wi-fi disconnected", 1);
+
+    display.setTextSize(2);
+    display.setTextColor(WHITE);
+
+    // Temperature left
+    display.setCursor(4, 12);
     display.print(state.temperature, 1);
-    display.println(" C");
-    display.setCursor(0, 20);
-    display.print("Humidity: ");
-    display.print(state.humidity, 1);
-    display.println("%");
+    display.write(247); // Degree symbol
 
-    display.setCursor(0, 40);
+    // Humidity right
+    display.setCursor(88, 12);
+    display.print(state.humidity, 0);
+    display.print("%");
 
-    display.print("CO2: ");
-    display.print(state.co2);
-    display.println(" ppm");
+    // Second row: CO2
+    display.setCursor(4, 30);
+    display.print(state.co2, 0);
+    display.print(" ppm");
+
+    // Footer
+    const char *alertMsg = "";
+    if (state.humidity < 30)
+    {
+        alertMsg = "Low humidity";
+    }
+    else if (state.humidity > 70)
+    {
+        alertMsg = "High humidity";
+    }
+    else if (state.co2 > 1000)
+    {
+        alertMsg = "High CO2";
+    }
+    else
+    {
+        alertMsg = "Normal";
+    }
+
+    drawFooter(display, alertMsg);
 
     display.display();
 }

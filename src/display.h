@@ -13,7 +13,7 @@
 
 void initDisplay(Adafruit_SSD1306 &display, DeviceState &state);
 void updateDisplay(Adafruit_SSD1306 &display, const DeviceState &state);
-void drawHeader(Adafruit_SSD1306 &display, const char *headerText);
+void drawHeader(Adafruit_SSD1306 &display, const char *headerText, int textSize);
 void drawFooter(Adafruit_SSD1306 &display, const char *footerText);
 
 #endif
