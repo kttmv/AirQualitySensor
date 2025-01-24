@@ -1,6 +1,25 @@
 #include "display.h"
 #include <Wire.h>
 
+void drawHeader(Adafruit_SSD1306 &display, const char *headerText)
+{
+    display.setTextSize(2);
+    display.setTextColor(WHITE);
+    display.setCursor(0, 0);
+    display.println(headerText);
+    display.drawLine(0, 16, 128, 16, WHITE);
+    display.setTextSize(1);
+    display.setCursor(0, 20);
+}
+
+void drawFooter(Adafruit_SSD1306 &display, const char *footerText)
+{
+    display.drawRect(0, 48, 128, 16, WHITE);
+    display.setCursor(4, 52);
+    display.print(footerText);
+    display.display();
+}
+
 void initDisplay(Adafruit_SSD1306 &display, DeviceState &state)
 {
     Wire.begin(SDA_PIN, SCL_PIN);
