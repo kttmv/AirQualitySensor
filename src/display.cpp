@@ -102,25 +102,25 @@ void updateDisplay()
     const char *status;
     if (readingIndex == 0) // Temperature
     {
-        if (state.temperature < 18)
+        if (sensorsState.temperature < 18)
             status = "LOW";
-        else if (state.temperature > 24)
+        else if (sensorsState.temperature > 24)
             status = "HIGH";
         else
             status = "OK";
     }
     else if (readingIndex == 1) // Humidity
     {
-        if (state.humidity < 40)
+        if (sensorsState.humidity < 40)
             status = "LOW";
-        else if (state.humidity > 60)
+        else if (sensorsState.humidity > 60)
             status = "HIGH";
         else
             status = "OK";
     }
     else // CO2
     {
-        if (state.co2 > 1000)
+        if (sensorsState.co2 > 1000)
             status = "HIGH";
         else
             status = "OK";
@@ -130,15 +130,15 @@ void updateDisplay()
     char readingValue[10];
     if (readingIndex == 0)
     {
-        snprintf(readingValue, sizeof(readingValue), "%.1f", state.temperature);
+        snprintf(readingValue, sizeof(readingValue), "%.1f", sensorsState.temperature);
     }
     else if (readingIndex == 1)
     {
-        snprintf(readingValue, sizeof(readingValue), "%.1f", state.humidity);
+        snprintf(readingValue, sizeof(readingValue), "%.1f", sensorsState.humidity);
     }
     else
     {
-        snprintf(readingValue, sizeof(readingValue), "%d", (int)state.co2);
+        snprintf(readingValue, sizeof(readingValue), "%d", (int)sensorsState.co2);
     }
 
     display.setTextSize(4);

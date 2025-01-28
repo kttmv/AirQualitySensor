@@ -6,11 +6,11 @@
 
 #include "main.h"
 
-DeviceState state;
+SensorstState sensorsState;
 Adafruit_SHT4x sht4;
 MHZ19 myMHZ19;
 
-AveragingBuffer buffer;
+SensorReadingsBuffer buffer;
 
 void initSHT4()
 {
@@ -31,13 +31,13 @@ void updateSensors()
 {
     sensors_event_t humidity, temp;
     sht4.getEvent(&humidity, &temp);
-    state.temperature = temp.temperature;
-    state.humidity = humidity.relative_humidity;
+    sensorsState.temperature = temp.temperature;
+    sensorsState.humidity = humidity.relative_humidity;
 
-    state.co2 = myMHZ19.getCO2();
+    sensorsState.co2 = myMHZ19.getCO2();
 
-    buffer.readings[buffer.currentIndex] = {state.temperature, state.humidity,
-                                            state.co2};
+    buffer.readings[buffer.currentIndex] = {sensorsState.temperature, sensorsState.humidity,
+                                            sensorsState.co2};
     buffer.currentIndex = (buffer.currentIndex + 1) % 12;
     if (buffer.count < 12)
     {

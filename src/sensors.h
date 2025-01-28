@@ -11,27 +11,25 @@ struct SensorReading
     int co2;
 };
 
-struct AveragingBuffer
+struct SensorReadingsBuffer
 {
     SensorReading readings[12];
     int currentIndex = 0;
     int count = 0;
 };
 
-struct DeviceState
+struct SensorstState
 {
     float temperature = 0.0;
     float humidity = 0.0;
     int co2 = 0;
-    unsigned long lastUpdate = 0;
 };
 
-extern DeviceState state;
+extern SensorstState sensorsState;
 extern Adafruit_SHT4x sht4;
 extern MHZ19 myMHZ19;
 
-extern AveragingBuffer buffer;
-
+extern SensorReadingsBuffer buffer;
 
 void initSHT4();
 void initMHZ19();
