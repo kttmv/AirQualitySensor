@@ -1,11 +1,17 @@
-#include "wifi_setup.h"
-#include "display.h"
+#include <WiFiManager.h>
+
 #include <ESP8266WiFi.h>
 
-void showAPScreen(Adafruit_SSD1306 &display)
+#include "sensors.h"
+#include "display.h"
+#include "wifi_manager.h"
+
+WiFiManager wifiManager;
+
+void showAPScreen()
 {
     display.clearDisplay();
-    drawHeader(display, "WiFi");
+    drawHeader("WiFi");
 
     display.setCursor(0, 20);
     display.println("To configure wi-fi");
@@ -16,55 +22,52 @@ void showAPScreen(Adafruit_SSD1306 &display)
     display.setCursor(0, 0);
 }
 
-void showConnectingScreen(Adafruit_SSD1306 &display)
+void showConnectingScreen()
 {
     display.clearDisplay();
-    drawHeader(display, "WiFi");
+    drawHeader("WiFi");
 
     display.setCursor(0, 20);
     display.println("Connecting to:");
     display.print("> ");
     display.println(WiFi.SSID());
-    drawFooter(display, "Please wait...");
+    drawFooter("Please wait...");
 
     display.display();
     display.setCursor(0, 0);
 }
 
-void showSuccessScreen(Adafruit_SSD1306 &display, const char *dataEndpoint)
+void showSuccessScreen()
 {
     display.clearDisplay();
-    drawHeader(display, "WiFi");
+    drawHeader("WiFi");
     display.setCursor(0, 20);
 
     display.println("Connected!");
     display.print("> ");
     display.println(WiFi.localIP());
-    drawFooter(display, "Ready");
+    drawFooter("Ready");
 
     display.display();
     display.setCursor(0, 0);
 }
 
-void connectWiFi(Adafruit_SSD1306 &display, WiFiManager &wifiManager,
-                 WiFiManagerParameter &customDataEndpoint, char *dataEndpoint,
-                 DeviceState &state)
+void connectWiFi()
 {
-    wifiManager.addParameter(&customDataEndpoint);
     wifiManager.setConfigPortalBlocking(false);
 
-    auto displayAPCallback = [&display](WiFiManager *mgr)
+    auto displayAPCallback = [](WiFiManager *mgr)
     {
-        showAPScreen(display);
+        showAPScreen();
         delay(3000);
     };
     wifiManager.setAPCallback(displayAPCallback);
 
-    showConnectingScreen(display);
+    showConnectingScreen();
 
     if (wifiManager.autoConnect("AutoConnectAP"))
     {
-        showSuccessScreen(display, dataEndpoint);
+        showSuccessScreen();
         delay(3000);
     }
 }

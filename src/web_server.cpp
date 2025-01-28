@@ -1,8 +1,16 @@
 #include "web_server.h"
-#include <Arduino.h>
 
-String generateHtmlResponse(const DeviceState &state)
-{ // Internal only
+#include <ESP8266WebServer.h>
+
+#include "sensors.h"
+#include "web_server.h"
+#include "wifi_manager.h"
+#include "display.h"
+
+WiFiServer server(80);
+
+String generateHtmlResponse()
+{
     String html = "<!DOCTYPE HTML><html><head>";
     html += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
     html += "<style>body{font-family:Arial;margin:20px;} .reset-btn{background-color:#ff3333;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}</style></head><body>";
@@ -17,10 +25,9 @@ String generateHtmlResponse(const DeviceState &state)
     return html;
 }
 
-void handleClient(WiFiServer &server, WiFiManager &wifiManager,
-                  Adafruit_SSD1306 &display, DeviceState &state)
+void handleClient()
 {
-    WiFiClient client = server.available();
+    WiFiClient client = server.accept();
     if (!client)
         return;
 
@@ -56,7 +63,7 @@ void handleClient(WiFiServer &server, WiFiManager &wifiManager,
         client.println("HTTP/1.1 200 OK");
         client.println("Content-Type: text/html");
         client.println("");
-        client.println(generateHtmlResponse(state));
+        client.println(generateHtmlResponse());
         client.stop();
     }
 }

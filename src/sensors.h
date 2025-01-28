@@ -1,21 +1,8 @@
 #ifndef SENSORS_H
 #define SENSORS_H
 
-#include <Arduino.h>
 #include <Adafruit_SHT4x.h>
 #include <MHZ19.h>
-#include <SoftwareSerial.h>
-
-// Sensor update interval
-const unsigned long SENSOR_UPDATE_INTERVAL = 1000;
-
-// MHZ19 Pins
-#define RX_PIN 3
-#define TX_PIN 1
-
-// SHT4 Pins
-#define SDA_PIN 0
-#define SCL_PIN 2
 
 struct SensorReading
 {
@@ -39,9 +26,16 @@ struct DeviceState
     unsigned long lastUpdate = 0;
 };
 
-void initSHT4(Adafruit_SHT4x &sht4, DeviceState &state);
-void initMHZ19(SoftwareSerial &mySerial, MHZ19 &myMHZ19, DeviceState &state);
-void updateSensors(Adafruit_SHT4x &sht4, MHZ19 &myMHZ19,
-                   AveragingBuffer &buffer, DeviceState &state);
+extern DeviceState state;
+extern Adafruit_SHT4x sht4;
+extern MHZ19 myMHZ19;
+
+extern AveragingBuffer buffer;
+
+
+void initSHT4();
+void initMHZ19();
+void updateSensors();
+SensorReading calculateAverages();
 
 #endif

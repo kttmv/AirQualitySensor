@@ -1,65 +1,49 @@
-#include <Arduino.h>
-#include <Adafruit_SHT4x.h>
-#include <Adafruit_SSD1306.h>
-#include <ArduinoJson.h>
-#include <DNSServer.h>
-#include <ESP8266HTTPClient.h>
-#include <ESP8266WebServer.h>
-#include <ESP8266WiFi.h>
-#include <MHZ19.h>
-#include <SoftwareSerial.h>
-#include <WiFiManager.h>
-#include <Wire.h>
+#include "main.h"
 
 #include "display.h"
 #include "sensors.h"
-#include "wifi_setup.h"
+#include "wifi_manager.h"
 #include "web_server.h"
 #include "data_endpoint.h"
 
-// Global objects
-Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
-Adafruit_SHT4x sht4;
-MHZ19 myMHZ19;
-SoftwareSerial mySerial(RX_PIN, TX_PIN);
-WiFiServer server(80);
-WiFiManager wifiManager;
+const unsigned int RX_PIN = 3;
+const unsigned int TX_PIN = 1;
 
-DeviceState state;
-AveragingBuffer buffer;
-char dataEndpoint[80];
-WiFiManagerParameter customDataEndpoint("dataEndpoint", "Data endpoint",
-                                        dataEndpoint, 80);
+const unsigned int SDA_PIN = 0;
+const unsigned int SCL_PIN = 2;
+
+const unsigned long POST_INTERVAL = 5000;
+const unsigned int SENSOR_UPDATE_INTERVAL = 1000;
 
 unsigned long lastPostMillis = 0;
-const unsigned long POST_INTERVAL = 5000;
+
+SoftwareSerial mySerial(RX_PIN, TX_PIN);
 
 void setup()
 {
   Wire.begin(SDA_PIN, SCL_PIN);
-  initDisplay(display, state);
-  initSHT4(sht4, state);
-  initMHZ19(mySerial, myMHZ19, state);
-  connectWiFi(display, wifiManager,
-              customDataEndpoint, dataEndpoint, state);
+  initDisplay();
+  initSHT4();
+  initMHZ19();
+  connectWiFi();
   server.begin();
 }
 
 void loop()
 {
-  handleClient(server, wifiManager, display, state);
+  handleClient();
 
   unsigned long currentMillis = millis();
   if (currentMillis - state.lastUpdate >= SENSOR_UPDATE_INTERVAL)
   {
     state.lastUpdate = currentMillis;
-    updateSensors(sht4, myMHZ19, buffer, state);
-    updateDisplay(display, state);
+    updateSensors();
+    updateDisplay();
   }
 
   if (currentMillis - lastPostMillis >= POST_INTERVAL)
   {
     lastPostMillis = currentMillis;
-    sendDataToServer(dataEndpoint, buffer, display, state);
+    sendDataToServer();
   }
 }

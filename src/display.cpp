@@ -1,5 +1,15 @@
 #include "display.h"
 #include <ESP8266WiFi.h>
+#include "sensors.h"
+
+#define SCREEN_WIDTH 128
+#define SCREEN_HEIGHT 64
+#define CHARACTER_WIDTH 6
+#define CHARACTER_HEIGHT 8
+#define OLED_RESET -1
+#define SCREEN_ADDRESS 0x3C
+
+Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 static unsigned long lastReadingSwitch = 0;
 static int readingIndex = 0;
@@ -29,7 +39,7 @@ int calculateTextX(const char *text, int textSize, TextAlign alignment)
     }
 }
 
-void drawHeader(Adafruit_SSD1306 &display, const char *headerText, TextAlign alignment)
+void drawHeader(const char *headerText, TextAlign alignment)
 {
     display.setTextSize(2);
 
@@ -43,7 +53,7 @@ void drawHeader(Adafruit_SSD1306 &display, const char *headerText, TextAlign ali
     display.setCursor(0, 0);
 }
 
-void drawFooter(Adafruit_SSD1306 &display, const char *footerText, TextAlign alignment)
+void drawFooter(const char *footerText, TextAlign alignment)
 {
     display.setTextSize(1);
     display.drawRect(0, 53, SCREEN_WIDTH, 11, WHITE);
@@ -65,7 +75,7 @@ void drawFooter(Adafruit_SSD1306 &display, const char *footerText, TextAlign ali
     display.setCursor(0, 0);
 }
 
-void initDisplay(Adafruit_SSD1306 &display, DeviceState &state)
+void initDisplay()
 {
     display.begin(SSD1306_SWITCHCAPVCC, SCREEN_ADDRESS);
 
@@ -74,7 +84,7 @@ void initDisplay(Adafruit_SSD1306 &display, DeviceState &state)
     display.setTextColor(WHITE);
 }
 
-void updateDisplay(Adafruit_SSD1306 &display, const DeviceState &state)
+void updateDisplay()
 {
     display.clearDisplay();
 
@@ -87,7 +97,7 @@ void updateDisplay(Adafruit_SSD1306 &display, const DeviceState &state)
     const char *readingTypes[3] = {"T \xF7"
                                    "C",
                                    "RH %", "CO2"};
-    drawHeader(display, readingTypes[readingIndex], TextAlign::LEFT);
+    drawHeader(readingTypes[readingIndex], TextAlign::LEFT);
 
     const char *status;
     if (readingIndex == 0) // Temperature
@@ -115,7 +125,7 @@ void updateDisplay(Adafruit_SSD1306 &display, const DeviceState &state)
         else
             status = "OK";
     }
-    drawHeader(display, status, TextAlign::RIGHT);
+    drawHeader(status, TextAlign::RIGHT);
 
     char readingValue[10];
     if (readingIndex == 0)
@@ -146,17 +156,17 @@ void updateDisplay(Adafruit_SSD1306 &display, const DeviceState &state)
         }
         if (showWiFiText)
         {
-            drawFooter(display, "WiFi connected");
+            drawFooter("WiFi connected");
         }
         else
         {
             String ip = WiFi.localIP().toString();
-            drawFooter(display, ip.c_str());
+            drawFooter(ip.c_str());
         }
     }
     else
     {
-        drawFooter(display, "WiFi disconnected");
+        drawFooter("WiFi disconnected");
     }
 
     display.display();
