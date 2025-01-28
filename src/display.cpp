@@ -9,15 +9,16 @@
 #define OLED_RESET -1
 #define SCREEN_ADDRESS 0x3C
 
-const unsigned int SENSOR_READING_SWITCH_INTERVAL = 1000;
-const unsigned int FOOTER_MESSAGE_SWITCH_INTERVAL = 5000;
+const unsigned int SENSOR_READING_SWITCH_INTERVAL = 1500;
+const unsigned int FOOTER_MESSAGE_SWITCH_INTERVAL = 3000;
 
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
+static unsigned long lastFooterSwitch = 0;
 static unsigned long lastReadingSwitch = 0;
+
 static unsigned int readingIndex = 0;
 
-static unsigned long lastFooterSwitch = 0;
 static bool showWiFiText = true;
 
 int calculateTextX(const char *text, int textSize, TextAlign alignment)
@@ -102,28 +103,30 @@ void updateDisplay()
                                    "RH %", "CO2"};
     drawHeader(readingTypes[readingIndex], TextAlign::LEFT);
 
+    SensorReading averageReadings = calculateAverages();
+
     const char *status;
     if (readingIndex == 0) // Temperature
     {
-        if (sensorsState.temperature < 18)
+        if (averageReadings.temperature < 18)
             status = "LOW";
-        else if (sensorsState.temperature > 24)
+        else if (averageReadings.temperature > 24)
             status = "HIGH";
         else
             status = "OK";
     }
     else if (readingIndex == 1) // Humidity
     {
-        if (sensorsState.humidity < 40)
+        if (averageReadings.humidity < 40)
             status = "LOW";
-        else if (sensorsState.humidity > 60)
+        else if (averageReadings.humidity > 60)
             status = "HIGH";
         else
             status = "OK";
     }
     else // CO2
     {
-        if (sensorsState.co2 > 1000)
+        if (averageReadings.co2 > 1000)
             status = "HIGH";
         else
             status = "OK";
@@ -133,15 +136,15 @@ void updateDisplay()
     char readingValue[10];
     if (readingIndex == 0)
     {
-        snprintf(readingValue, sizeof(readingValue), "%.1f", sensorsState.temperature);
+        snprintf(readingValue, sizeof(readingValue), "%.1f", averageReadings.temperature);
     }
     else if (readingIndex == 1)
     {
-        snprintf(readingValue, sizeof(readingValue), "%.1f", sensorsState.humidity);
+        snprintf(readingValue, sizeof(readingValue), "%.1f", averageReadings.humidity);
     }
     else
     {
-        snprintf(readingValue, sizeof(readingValue), "%d", (int)sensorsState.co2);
+        snprintf(readingValue, sizeof(readingValue), "%d", averageReadings.co2);
     }
 
     display.setTextSize(4);

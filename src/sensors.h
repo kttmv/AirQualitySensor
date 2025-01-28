@@ -4,7 +4,7 @@
 #include <Adafruit_SHT4x.h>
 #include <MHZ19.h>
 
-const unsigned int SENSOR_READINGS_BUFFER_SIZE = 12;
+const unsigned int SENSOR_READINGS_BUFFER_SIZE = 6;
 
 struct SensorReading
 {

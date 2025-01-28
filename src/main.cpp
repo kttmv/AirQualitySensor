@@ -12,7 +12,7 @@ const unsigned int TX_PIN = 1;
 const unsigned int SDA_PIN = 0;
 const unsigned int SCL_PIN = 2;
 
-const unsigned long POST_INTERVAL = 5000;
+const unsigned int POST_INTERVAL = 5000;
 const unsigned int SENSOR_UPDATE_INTERVAL = 5000;
 
 static unsigned long lastPostMillis = 0;
@@ -40,12 +40,15 @@ void loop()
   {
     lastSensorsUpdateMillis = currentMillis;
     updateSensors();
-    updateDisplay();
   }
+
+  updateDisplay();
 
   if (currentMillis - lastPostMillis >= POST_INTERVAL)
   {
     lastPostMillis = currentMillis;
     sendDataToServer();
   }
+
+  delay(100);
 }
