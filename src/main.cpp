@@ -15,8 +15,8 @@ const unsigned int SCL_PIN = 2;
 const unsigned long POST_INTERVAL = 5000;
 const unsigned int SENSOR_UPDATE_INTERVAL = 5000;
 
-unsigned long lastPostMillis = 0;
-unsigned long lastSensorsUpdateMillis = 0;
+static unsigned long lastPostMillis = 0;
+static unsigned long lastSensorsUpdateMillis = 0;
 
 SoftwareSerial mySerial(RX_PIN, TX_PIN);
 

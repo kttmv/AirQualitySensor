@@ -9,10 +9,13 @@
 #define OLED_RESET -1
 #define SCREEN_ADDRESS 0x3C
 
+const unsigned int SENSOR_READING_SWITCH_INTERVAL = 1000;
+const unsigned int FOOTER_MESSAGE_SWITCH_INTERVAL = 5000;
+
 Adafruit_SSD1306 display(SCREEN_WIDTH, SCREEN_HEIGHT, &Wire, OLED_RESET);
 
 static unsigned long lastReadingSwitch = 0;
-static int readingIndex = 0;
+static unsigned int readingIndex = 0;
 
 static unsigned long lastFooterSwitch = 0;
 static bool showWiFiText = true;
@@ -88,7 +91,7 @@ void updateDisplay()
 {
     display.clearDisplay();
 
-    if (millis() - lastReadingSwitch > 2000)
+    if (millis() - lastReadingSwitch > SENSOR_READING_SWITCH_INTERVAL)
     {
         readingIndex = (readingIndex + 1) % 3;
         lastReadingSwitch = millis();
@@ -149,7 +152,7 @@ void updateDisplay()
     bool wifiConnected = (WiFi.status() == WL_CONNECTED);
     if (wifiConnected)
     {
-        if (millis() - lastFooterSwitch > 5000)
+        if (millis() - lastFooterSwitch > SENSOR_READING_SWITCH_INTERVAL)
         {
             showWiFiText = !showWiFiText;
             lastFooterSwitch = millis();
