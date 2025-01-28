@@ -3,7 +3,6 @@
 
 #include <Adafruit_SSD1306.h>
 
-
 extern Adafruit_SSD1306 display;
 
 enum class TextAlign
@@ -14,7 +13,7 @@ enum class TextAlign
 };
 
 void initDisplay();
-void updateDisplay();
+int calculateTextX(const char *text, int textSize, TextAlign alignment);
 void drawHeader(const char *headerText, TextAlign alignment = TextAlign::LEFT);
 void drawFooter(const char *footerText, TextAlign alignment = TextAlign::CENTER);
 
