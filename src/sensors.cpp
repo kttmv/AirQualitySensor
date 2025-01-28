@@ -38,8 +38,10 @@ void updateSensors()
 
     buffer.readings[buffer.currentIndex] = {sensorsState.temperature, sensorsState.humidity,
                                             sensorsState.co2};
-    buffer.currentIndex = (buffer.currentIndex + 1) % 12;
-    if (buffer.count < 12)
+
+    buffer.currentIndex = (buffer.currentIndex + 1) % SENSOR_READINGS_BUFFER_SIZE;
+
+    if (buffer.count < SENSOR_READINGS_BUFFER_SIZE)
     {
         buffer.count++;
     }
@@ -51,7 +53,7 @@ SensorReading calculateAverages()
     float humSum = 0;
     int co2Sum = 0;
 
-    for (int i = 0; i < buffer.count; i++)
+    for (unsigned int i = 0; i < buffer.count; i++)
     {
         tempSum += buffer.readings[i].temperature;
         humSum += buffer.readings[i].humidity;

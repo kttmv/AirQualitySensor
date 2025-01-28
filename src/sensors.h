@@ -4,25 +4,27 @@
 #include <Adafruit_SHT4x.h>
 #include <MHZ19.h>
 
+const unsigned int SENSOR_READINGS_BUFFER_SIZE = 12;
+
 struct SensorReading
 {
     float temperature;
     float humidity;
-    int co2;
+    unsigned int co2;
 };
 
 struct SensorReadingsBuffer
 {
-    SensorReading readings[12];
-    int currentIndex = 0;
-    int count = 0;
+    SensorReading readings[SENSOR_READINGS_BUFFER_SIZE];
+    unsigned int currentIndex = 0;
+    unsigned int count = 0;
 };
 
 struct SensorstState
 {
     float temperature = 0.0;
     float humidity = 0.0;
-    int co2 = 0;
+    unsigned int co2 = 0;
 };
 
 extern SensorstState sensorsState;
