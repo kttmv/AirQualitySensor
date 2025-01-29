@@ -5,6 +5,7 @@
 #include <SoftwareSerial.h>
 
 #include "main.h"
+#include "eeprom_utilities.h"
 
 SensorstState sensorsState;
 Adafruit_SHT4x sht4;
@@ -22,9 +23,9 @@ void initSHT4()
 
 void initMHZ19()
 {
+    loadAutoCalibration();
     mySerial.begin(9600);
     myMHZ19.begin(mySerial);
-    myMHZ19.autoCalibration();
 }
 
 void updateSensors()

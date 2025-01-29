@@ -6,6 +6,7 @@
 #include "web_server.h"
 #include "data_endpoint.h"
 #include "main_screen.h"
+#include "eeprom_utilities.h"
 
 const unsigned int RX_PIN = 3;
 const unsigned int TX_PIN = 1;

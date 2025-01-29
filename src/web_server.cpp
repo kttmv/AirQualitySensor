@@ -8,6 +8,7 @@
 #include "display.h"
 #include "data_endpoint.h"
 #include "url_utilities.h"
+#include "eeprom_utilities.h"
 
 WiFiServer server(80);
 
@@ -20,16 +21,25 @@ String generateHtmlResponse()
     html += ".reset-btn{background-color:#ff3333;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}";
     html += ".save-btn{background-color:#4CAF50;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}";
     html += ".input-field{width:100%;padding:12px 20px;margin:8px 0;box-sizing:border-box;border:2px solid #ccc;border-radius:4px;}";
+    html += ".toggle-btn{background-color:#008CBA;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}";
     html += "</style></head><body>";
 
     html += "<p>Temperature: " + String(sensorsState.temperature, 1) + " °C</p>";
     html += "<p>Humidity: " + String(sensorsState.humidity, 1) + "%</p>";
     html += "<p>CO2: " + String(sensorsState.co2) + " ppm</p>";
+    html += "<p></p>";
+    html += "<p>MH-Z19B Autocalibration: ";
+    html += (mhz19bAutoCalibration ? "ON" : "OFF");
+    html += "</p>";
 
     html += "<form method='POST' action='/save_endpoint'>";
     html += "<p>Data Endpoint:</p>";
     html += "<input type='text' name='endpoint' value='" + dataEndpoint + "' class='input-field'>";
     html += "<input type='submit' class='save-btn' value='Save Endpoint'>";
+    html += "</form><br>";
+
+    html += "<form method='POST' action='/toggle_autocalibration'>";
+    html += "<input type='submit' class='toggle-btn' value='Toggle Autocalibration'>";
     html += "</form><br>";
 
     html += "<form method='POST' action='/reset'>";
@@ -99,6 +109,22 @@ void handleClient()
         delay(1000);
         wifiManager.resetSettings();
         ESP.restart();
+    }
+    else if (request.indexOf("POST /toggle_autocalibration") != -1)
+    {
+        bool currentState = mhz19bAutoCalibration;
+        saveAutoCalibration(!currentState);
+
+        client.println("HTTP/1.1 200 OK");
+        client.println("Content-Type: text/html");
+        client.println();
+        client.println("<!DOCTYPE HTML><html><head>");
+        client.println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
+        client.println("<meta http-equiv='refresh' content='2;url=/'>");
+        client.println("</head><body>");
+        client.println("<h2>Autocalibration Setting Updated!</h2>");
+        client.println("<p>Redirecting...</p>");
+        client.println("</body></html>");
     }
     else
     {
