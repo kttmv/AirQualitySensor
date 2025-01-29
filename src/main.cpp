@@ -35,6 +35,7 @@ void setup()
 
 void loop()
 {
+  wifiManager.process();
   handleClient();
 
   unsigned long currentMillis = millis();

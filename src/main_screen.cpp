@@ -3,7 +3,7 @@
 #include "sensors.h"
 
 const unsigned int SENSOR_READING_SWITCH_INTERVAL = 1500;
-const unsigned int FOOTER_MESSAGE_SWITCH_INTERVAL = 3000;
+const unsigned int FOOTER_MESSAGE_SWITCH_INTERVAL = 4000;
 
 static unsigned long lastFooterSwitchMillis = 0;
 static unsigned long lastReadingSwitchMillis = 0;
@@ -78,7 +78,7 @@ void showMainScreen()
     bool wifiConnected = (WiFi.status() == WL_CONNECTED);
     if (wifiConnected)
     {
-        if (millis() - lastFooterSwitchMillis > SENSOR_READING_SWITCH_INTERVAL)
+        if (millis() - lastFooterSwitchMillis > FOOTER_MESSAGE_SWITCH_INTERVAL)
         {
             showWiFiText = !showWiFiText;
             lastFooterSwitchMillis = millis();
