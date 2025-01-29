@@ -8,6 +8,7 @@
 
 #include "sensors.h"
 #include "display.h"
+#include "main_screen.h"
 
 const unsigned int EEPROM_SIZE = 512;
 const unsigned int ENDPOINT_ADDRESS = 0;
@@ -65,13 +66,7 @@ void sendDataToServer()
 
     if (httpResponseCode > 0)
     {
-        display.clearDisplay();
-        display.setCursor(0, 0);
-        display.println("Avg data sent!");
-        display.print("Response: ");
-        display.println(httpResponseCode);
-        display.display();
-        delay(1000);
+        showCustomFooterMessage(("Data sent (" + std::to_string(httpResponseCode) + ")").c_str());
     }
 
     http.end();
