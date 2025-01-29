@@ -29,6 +29,9 @@ void setup()
   initDisplay();
   initSHT4();
   initMHZ19();
+
+  loadEndpoint();
+
   connectWiFi();
   server.begin();
 }

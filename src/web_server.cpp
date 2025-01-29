@@ -6,6 +6,8 @@
 #include "web_server.h"
 #include "wifi_manager.h"
 #include "display.h"
+#include "data_endpoint.h"
+#include "url_utilities.h"
 
 WiFiServer server(80);
 
@@ -13,11 +15,22 @@ String generateHtmlResponse()
 {
     String html = "<!DOCTYPE HTML><html><head>";
     html += "<meta name='viewport' content='width=device-width, initial-scale=1'>";
-    html += "<style>body{font-family:Arial;margin:20px;} .reset-btn{background-color:#ff3333;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}</style></head><body>";
+    html += "<style>";
+    html += "body{font-family:Arial;margin:20px;}";
+    html += ".reset-btn{background-color:#ff3333;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}";
+    html += ".save-btn{background-color:#4CAF50;color:white;padding:10px 20px;border:none;border-radius:4px;cursor:pointer;}";
+    html += ".input-field{width:100%;padding:12px 20px;margin:8px 0;box-sizing:border-box;border:2px solid #ccc;border-radius:4px;}";
+    html += "</style></head><body>";
 
     html += "<p>Temperature: " + String(sensorsState.temperature, 1) + " °C</p>";
     html += "<p>Humidity: " + String(sensorsState.humidity, 1) + "%</p>";
     html += "<p>CO2: " + String(sensorsState.co2) + " ppm</p>";
+
+    html += "<form method='POST' action='/save_endpoint'>";
+    html += "<p>Data Endpoint:</p>";
+    html += "<input type='text' name='endpoint' value='" + dataEndpoint + "' class='input-field'>";
+    html += "<input type='submit' class='save-btn' value='Save Endpoint'>";
+    html += "</form><br>";
 
     html += "<form method='POST' action='/reset'>";
     html += "<input type='submit' class='reset-btn' value='Reset WiFi Configuration'>";
@@ -34,7 +47,37 @@ void handleClient()
     String request = client.readStringUntil('\r');
     client.flush();
 
-    if (request.indexOf("POST /reset") != -1)
+    if (request.indexOf("POST /save_endpoint") != -1)
+    {
+        String postData = "";
+        while (client.available())
+        {
+            char c = client.read();
+            postData += c;
+        }
+
+        int startPos = postData.indexOf("endpoint=") + 9;
+        int endPos = postData.indexOf("&", startPos);
+        if (endPos == -1)
+            endPos = postData.length();
+        String newEndpoint = postData.substring(startPos, endPos);
+        newEndpoint = urlDecode(newEndpoint);
+
+        dataEndpoint = newEndpoint;
+        saveEndpoint(dataEndpoint);
+
+        client.println("HTTP/1.1 200 OK");
+        client.println("Content-Type: text/html");
+        client.println();
+        client.println("<!DOCTYPE HTML><html><head>");
+        client.println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
+        client.println("<meta http-equiv='refresh' content='2;url=/'>");
+        client.println("</head><body>");
+        client.println("<h2>Endpoint Saved Successfully!</h2>");
+        client.println("<p>Redirecting...</p>");
+        client.println("</body></html>");
+    }
+    else if (request.indexOf("POST /reset") != -1)
     {
         client.println("HTTP/1.1 200 OK");
         client.println("Content-Type: text/html");
@@ -54,7 +97,6 @@ void handleClient()
         display.display();
 
         delay(1000);
-
         wifiManager.resetSettings();
         ESP.restart();
     }
@@ -64,6 +106,6 @@ void handleClient()
         client.println("Content-Type: text/html");
         client.println("");
         client.println(generateHtmlResponse());
-        client.stop();
     }
+    client.stop();
 }
