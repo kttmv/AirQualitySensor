@@ -5,7 +5,7 @@
 #include <Arduino.h>
 
 extern String dataEndpoint;
-extern bool mhz19bAutoCalibration;
+extern bool mhz19AutoCalibration;
 
 void loadAutoCalibration();
 void saveAutoCalibration(bool value);

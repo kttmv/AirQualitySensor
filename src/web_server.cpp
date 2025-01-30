@@ -27,9 +27,8 @@ String generateHtmlResponse()
     html += "<p>Temperature: " + String(sensorsState.temperature, 1) + " °C</p>";
     html += "<p>Humidity: " + String(sensorsState.humidity, 1) + "%</p>";
     html += "<p>CO2: " + String(sensorsState.co2) + " ppm</p>";
-    html += "<p></p>";
-    html += "<p>MH-Z19B Autocalibration: ";
-    html += (mhz19bAutoCalibration ? "ON" : "OFF");
+    html += "<p style='margin-top: 16px;'>MH-Z19B Autocalibration: ";
+    html += (mhz19AutoCalibration ? "ON" : "OFF");
     html += "</p>";
 
     html += "<form method='POST' action='/save_endpoint'>";
@@ -40,6 +39,11 @@ String generateHtmlResponse()
 
     html += "<form method='POST' action='/toggle_autocalibration'>";
     html += "<input type='submit' class='toggle-btn' value='Toggle Autocalibration'>";
+    html += "</form><br>";
+
+    html += "<form method='POST' action='/calibrate_mhz19'>";
+    html += "<input type='submit' class='reset-btn' value='Calibrate MH-Z19B (400ppm)'>";
+    html += "<p><small>Warning: Only press after sensor has been in fresh air for 20+ minutes</small></p>";
     html += "</form><br>";
 
     html += "<form method='POST' action='/reset'>";
@@ -112,7 +116,7 @@ void handleClient()
     }
     else if (request.indexOf("POST /toggle_autocalibration") != -1)
     {
-        bool currentState = mhz19bAutoCalibration;
+        bool currentState = mhz19AutoCalibration;
         saveAutoCalibration(!currentState);
 
         client.println("HTTP/1.1 200 OK");
@@ -123,6 +127,22 @@ void handleClient()
         client.println("<meta http-equiv='refresh' content='2;url=/'>");
         client.println("</head><body>");
         client.println("<h2>Autocalibration Setting Updated!</h2>");
+        client.println("<p>Redirecting...</p>");
+        client.println("</body></html>");
+    }
+    else if (request.indexOf("POST /calibrate_mhz19") != -1)
+    {
+        calibrateMHZ19();
+
+        client.println("HTTP/1.1 200 OK");
+        client.println("Content-Type: text/html");
+        client.println();
+        client.println("<!DOCTYPE HTML><html><head>");
+        client.println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
+        client.println("<meta http-equiv='refresh' content='2;url=/'>");
+        client.println("</head><body>");
+        client.println("<h2>MH-Z19B Calibration Started!</h2>");
+        client.println("<p>Autocalibration has been disabled and calibration initiated.</p>");
         client.println("<p>Redirecting...</p>");
         client.println("</body></html>");
     }

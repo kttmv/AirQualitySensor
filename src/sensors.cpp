@@ -6,6 +6,7 @@
 
 #include "main.h"
 #include "eeprom_utilities.h"
+#include "main_screen.h"
 
 SensorstState sensorsState;
 Adafruit_SHT4x sht4;
@@ -27,6 +28,13 @@ void initMHZ19()
     myMHZ19.begin(mySerial);
 
     loadAutoCalibration();
+}
+
+void calibrateMHZ19()
+{
+    saveAutoCalibration(false);
+    myMHZ19.calibrate();
+    showCustomFooterMessage("MHZ19 calibrated");
 }
 
 void updateSensors()

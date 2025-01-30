@@ -35,6 +35,7 @@ extern SensorReadingsBuffer buffer;
 
 void initSHT4();
 void initMHZ19();
+void calibrateMHZ19();
 void updateSensors();
 SensorReading calculateAverages();
 
