@@ -23,9 +23,10 @@ void initSHT4()
 
 void initMHZ19()
 {
-    loadAutoCalibration();
     mySerial.begin(9600);
     myMHZ19.begin(mySerial);
+
+    loadAutoCalibration();
 }
 
 void updateSensors()

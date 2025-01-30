@@ -11,15 +11,6 @@ const unsigned int AUTO_CALIBRATION_ADDRESS = MAX_ENDPOINT_LENGTH + 1;
 String dataEndpoint = "";
 bool mhz19bAutoCalibration = false;
 
-void loadAutoCalibration()
-{
-    EEPROM.begin(EEPROM_SIZE);
-    mhz19bAutoCalibration = EEPROM.read(AUTO_CALIBRATION_ADDRESS) == 1;
-    EEPROM.end();
-
-    myMHZ19.autoCalibration(mhz19bAutoCalibration);
-}
-
 void saveAutoCalibration(bool value)
 {
     EEPROM.begin(EEPROM_SIZE);
@@ -32,6 +23,23 @@ void saveAutoCalibration(bool value)
 
     std::string message = std::string("Autocalibration: ") + std::string(value ? "ON" : "OFF");
     showCustomFooterMessage(message.c_str());
+}
+
+void loadAutoCalibration()
+{
+
+    EEPROM.begin(EEPROM_SIZE);
+    mhz19bAutoCalibration = EEPROM.read(AUTO_CALIBRATION_ADDRESS) == 1;
+    EEPROM.end();
+
+    bool autoCalibration = myMHZ19.getABC();
+
+    if (autoCalibration != mhz19bAutoCalibration)
+    {
+        saveAutoCalibration(autoCalibration);
+    }
+
+    myMHZ19.autoCalibration(mhz19bAutoCalibration);
 }
 
 void loadEndpoint()
