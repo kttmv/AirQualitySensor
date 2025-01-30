@@ -16,7 +16,7 @@ void showCustomFooterMessage(const char *message)
     footerState.customMessages.push(std::string(message));
 }
 
-void updateFooter()
+bool updateFooter()
 {
     unsigned long currentMillis = millis();
 
@@ -36,9 +36,11 @@ void updateFooter()
         if (!footerState.customMessages.empty())
         {
             drawFooter(footerState.customMessages.front().c_str());
-            return;
+            return true;
         }
     }
+
+    return false;
 }
 
 void showMainScreen()
@@ -55,6 +57,8 @@ void showMainScreen()
                                    "C",
                                    "RH %", "CO2"};
     drawHeader(readingTypes[readingIndex], TextAlign::LEFT);
+
+    bool footerDisplayed = updateFooter();
 
     SensorReading averageReadings = calculateAverages();
 
@@ -102,10 +106,13 @@ void showMainScreen()
 
     display.setTextSize(4);
     int xPos = calculateTextX(readingValue, 4, TextAlign::CENTER);
-    display.setCursor(xPos, 21);
-    display.print(readingValue);
 
-    updateFooter();
+    if (footerDisplayed)
+        display.setCursor(xPos, 21);
+    else
+        display.setCursor(xPos, 27);
+
+    display.print(readingValue);
 
     display.display();
 }
