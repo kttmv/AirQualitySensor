@@ -6,8 +6,6 @@
 
 struct FooterState
 {
-    unsigned long lastSwitchMillis = 0;
-    unsigned int messageIndex = 0;
     std::queue<std::string> customMessages;
     unsigned long customMessageStartTime = 0;
 };

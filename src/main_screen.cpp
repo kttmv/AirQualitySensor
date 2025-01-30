@@ -4,22 +4,9 @@
 #include "sensors.h"
 
 const unsigned int SENSOR_READING_SWITCH_INTERVAL = 1500;
-const unsigned int FOOTER_MESSAGE_SWITCH_INTERVAL = 4000;
-const unsigned int CUSTOM_MESSAGE_DISPLAY_TIME = 2000;
-
-const char *const WIFI_ENABLED_MESSAGES[] = {
-    "WiFi connected",
-    "IP: {LOCAL_IP}"};
-const size_t WIFI_ENABLED_MESSAGES_COUNT = sizeof(WIFI_ENABLED_MESSAGES) / sizeof(WIFI_ENABLED_MESSAGES[0]);
-
-const char *const WIFI_DISABLED_MESSAGES[] = {
-    "WiFi disconnected",
-    "Connect to hotspot:",
-    "AutoConnectAP"};
-const size_t WIFI_DISABLED_MESSAGES_COUNT = sizeof(WIFI_DISABLED_MESSAGES) / sizeof(WIFI_DISABLED_MESSAGES[0]);
+const unsigned int CUSTOM_MESSAGE_DISPLAY_TIME = 5000;
 
 static unsigned long lastReadingSwitchMillis = 0;
-
 static unsigned int readingIndex = 0;
 
 static FooterState footerState;
@@ -31,7 +18,6 @@ void showCustomFooterMessage(const char *message)
 
 void updateFooter()
 {
-    bool wifiConnected = (WiFi.status() == WL_CONNECTED);
     unsigned long currentMillis = millis();
 
     if (!footerState.customMessages.empty())
@@ -52,42 +38,6 @@ void updateFooter()
             drawFooter(footerState.customMessages.front().c_str());
             return;
         }
-    }
-
-    if (currentMillis - footerState.lastSwitchMillis >= FOOTER_MESSAGE_SWITCH_INTERVAL)
-    {
-        footerState.messageIndex++;
-        footerState.lastSwitchMillis = currentMillis;
-
-        if (wifiConnected)
-        {
-            footerState.messageIndex %= WIFI_ENABLED_MESSAGES_COUNT;
-        }
-        else
-        {
-            footerState.messageIndex %= WIFI_DISABLED_MESSAGES_COUNT;
-        }
-    }
-
-    if (wifiConnected)
-    {
-        const char *message = WIFI_ENABLED_MESSAGES[footerState.messageIndex];
-        if (strstr(message, "{LOCAL_IP}") != nullptr)
-        {
-            String ip = WiFi.localIP().toString();
-            String tempMessage = String(message);
-            tempMessage.replace("{LOCAL_IP}", ip);
-            drawFooter(tempMessage.c_str());
-        }
-        else
-        {
-            drawFooter(message);
-        }
-    }
-    else
-    {
-        const char *message = WIFI_DISABLED_MESSAGES[footerState.messageIndex];
-        drawFooter(message);
     }
 }
 
